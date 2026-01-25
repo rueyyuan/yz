@@ -79,7 +79,7 @@ function finalLogin() {
         
         // 2. 延迟跳转，给用户一个“退出”的动画感
         setTimeout(() => {
-            window.location.replace("你的视频网站链接.html");
+            window.location.replace("https://rueyyuan.github.io/yz/verity/index.html");
         }, 500);
     } else {
         alert("请先完成人机身份验证");
