@@ -70,12 +70,20 @@ function onCheckverify() {
 
 // 4. 最终登录按钮
 function finalLogin() {
-    if (!isVerified) {
+    const isTickVisible = !document.querySelector('.tick-box').classList.contains('close');
+
+    if (isTickVisible) {
+        // 1. 视觉上的关闭：让登录卡片消失
+        document.querySelector('.login-card').style.opacity = '0';
+        document.querySelector('.login-card').style.transition = '0.5s';
+        
+        // 2. 延迟跳转，给用户一个“退出”的动画感
+        setTimeout(() => {
+            window.location.replace("你的视频网站链接.html");
+        }, 500);
+    } else {
         alert("请先完成人机身份验证");
-        return;
     }
-    alert("验证通过，正在登录系统...");
-    // 这里执行 window.location.href 跳转
 }
 
 // 点击空白处关闭弹窗
