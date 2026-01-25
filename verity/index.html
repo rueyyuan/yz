@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>抖音式原生适配</title>
+    <style>
+        body, html { 
+            margin: 0; padding: 0; height: 100%; 
+            background: #000; overflow: hidden; 
+            user-select: none;
+        }
+
+        /* 视频承载区 */
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* 确保视频比例正确，不拉伸 */
+            background: #000;
+        }
+
+        /* 交互遮罩 - 100% 灵敏捕捉滑动和点击 */
+        .touch-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10;
+        }
+
+        /* 暂停图标 */
+        #playIcon {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 60px;
+            color: rgba(255,255,255,0.6);
+            display: none; /* 初始隐藏 */
+            z-index: 11;
+            pointer-events: none;
+        }
+
+        /* 底部提示 */
+        .tips {
+            position: absolute;
+            bottom: 30px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255,255,255,0.4);
+            font-size: 14px;
+            z-index: 11;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="video-container">
+        <video id="myVideo" 
+               src="http://api.yujn.cn/api/xjj.php" 
+               loop 
+               webkit-playsinline="true" 
+               playsinline="true" 
+               x5-video-player-type="h5-page">
+        </video>
+
+        <div class="touch-layer" id="touchLayer"></div>
+        <div id="playIcon">▶</div>
+        <div class="tips">上滑切换 · 点击播放/暂停</div>
+    </div>
+
+    <script>
+        const video = document.getElementById('myVideo');
+        const touchLayer = document.getElementById('touchLayer');
+        const playIcon = document.getElementById('playIcon');
+
+        let startY = 0;
+
+        // 自动播放处理（由于浏览器限制，静音通常可以自动播放）
+        window.addEventListener('load', () => {
+            video.play().catch(() => {
+                console.log("等待用户首次点击播放");
+            });
+        });
+
+        // 1. 点击暂停/播放逻辑
+        touchLayer.addEventListener('click', () => {
+            if (video.paused) {
+                video.play();
+                playIcon.style.display = 'none';
+            } else {
+                video.pause();
+                playIcon.style.display = 'block';
+            }
+        });
+
+        // 2. 上滑切换逻辑
+        touchLayer.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
+        });
+
+        touchLayer.addEventListener('touchend', (e) => {
+            let endY = e.changedTouches[0].clientY;
+            let distance = startY - endY;
+
+            if (distance > 80) { // 向上滑动超过 80 像素触发
+                nextVideo();
+            }
+        });
+
+        function nextVideo() {
+            // 切换时的反馈：淡出
+            video.style.transition = '0.3s';
+            video.style.opacity = '0.3';
+            
+            // 重新加载 API 链接获取新视频
+            // 加上时间戳强制刷新视频源
+            const newSrc = "http://api.yujn.cn/api/xjj.php?t=" + Date.now();
+            video.src = newSrc;
+            video.load();
+            
+            video.oncanplay = () => {
+                video.style.opacity = '1';
+                video.play();
+                playIcon.style.display = 'none';
+            };
+        }
+
+        // 适配电脑鼠标滚动
+        touchLayer.addEventListener('wheel', (e) => {
+            if (e.deltaY > 0) nextVideo();
+        });
+    </script>
+</body>
+</html>
