@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./imgs/8b98c0e2c4d5d492780d4fe891a734e9.jpg" type="image/x-icon">
+    <title>系统安全登录</title>
+    <link rel="stylesheet" href="./index.css">
+    <style>
+        /* 页面整体布局补丁 */
+        body {
+            background-color: #f8f9fa;
+            font-family: "Google Sans", arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-card {
+            background: #fff;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            width: 400px;
+            padding: 40px;
+            box-sizing: border-box;
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .login-card h1 { font-size: 24px; font-weight: 400; margin-bottom: 25px; }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group input {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .input-group input:focus { border: 2px solid var(--main-color); outline: none; }
+        
+        /* 验证框样式补丁：确保转圈不奇怪 */
+        .verify-check-box {
+            position: relative;
+            width: 28px;
+            height: 28px;
+            margin-left: 15px;
+        }
+        .spinner, .tick-box, .verify-check-box-border {
+            position: absolute;
+            top: 0;
+            left: 0;
+            margin: 0 !important; /* 覆盖原有的 margin */
+        }
+
+        .submit-btn {
+            width: 100%;
+            background-color: var(--main-color);
+            color: #fff;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        .submit-btn:hover { background-color: #357abd; }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <img src="./imgs/8b98c0e2c4d5d492780d4fe891a734e9.jpg" width="60" style="border-radius: 50%;">
+        <h1>登录</h1>
+
+        <div class="input-group">
+            <input type="text" id="account" placeholder="电子邮件地址或电话号码">
+        </div>
+        <div class="input-group">
+            <input type="password" id="password" placeholder="请输入密码">
+        </div>
+
+        <div class="verify-box">
+            <div class="verify-check-box">
+                <div class="spinner close"></div>
+                <div class="tick-box close">
+                    <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
+                        <path class="tick" d="M43 11L16.875 37L5 25.1818" stroke="#20af46" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="verify-check-box-border" onclick="onOpenverify()"></div>
+                
+                <div class="verify-layer close">
+                    <div class="triangle triangle_border"></div>
+                    <div class="triangle triangle_bg"></div>
+                    <div class="head">
+                        <div>请选择所有包含</div>
+                        <div id="thing" style="font-weight: bold;font-size: 30px;">最帅的人</div>
+                        <div>的图片。</div>
+                    </div>
+                    <div class="imgs">
+                        <div class="image-box"><img class="img" src="./imgs/1.jpg"><img class="checked-ico" width="24" height="24" src="./imgs/check-one.png"></div>
+                        <div class="image-box"><img class="img" src="./imgs/2.jpg"><img class="checked-ico" width="24" height="24" src="./imgs/check-one.png"></div>
+                        <div class="image-box"><img class="img" src="./imgs/3.jpg"><img class="checked-ico" width="24" height="24" src="./imgs/check-one.png"></div>
+                        <div class="image-box"><img class="img" src="./imgs/4.jpg"><img class="checked-ico" width="24" height="24" src="./imgs/check-one.png"></div>
+                        <div class="image-box"><img class="img" src="./imgs/5.jpg"><img class="checked-ico" width="24" height="24" src="./imgs/check-one.png"></div>
+                        <div class="image-box"><img class="img" src="./imgs/6.jpg"><img class="checked-ico" width="24" height="24" src="./imgs/check-one.png"></div>
+                        <div class="image-box"><img class="img" src="./imgs/7.jpg"><img class="checked-ico" width="24" height="24" src="./imgs/check-one.png"></div>
+                        <div class="image-box"><img class="img" src="./imgs/8.jpg"><img class="checked-ico" width="24" height="24" src="./imgs/check-one.png"></div>
+                        <div class="image-box"><img class="img" src="./imgs/9.jpg"><img class="checked-ico" width="24" height="24" src="./imgs/check-one.png"></div>
+                    </div>
+                    <div id="error" style="display: none; color: red; font-size: 12px; margin-top: 5px;">请选择图片</div>
+                    <div class="bottom">
+                        <button onclick="onCheckverify()">验证</button>
+                    </div>
+                </div>
+            </div>
+            <div style="flex-grow: 1; text-align: left; padding-left: 10px;">
+                <span id="validation" style="font-size: 14px; color: #555;">进行人机身份验证</span>
+            </div>
+            <div class="ico">
+                <img src="./imgs/8b98c0e2c4d5d492780d4fe891a734e9.jpg" style="width: 25px; height: 25px;">
+                <div style="font-size: 9px; line-height: 1;">Yuan Verity</div>
+            </div>
+        </div>
+
+        <button class="submit-btn" onclick="finalLogin()">登录</button>
+    </div>
+
+    <script src="./verify.js"></script>
+</body>
+</html>
