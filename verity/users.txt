@@ -1,2 +1,1 @@
-admin:yuange
-user1:66666666
+yuange:66666666
