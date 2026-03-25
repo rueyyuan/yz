@@ -58,6 +58,7 @@ function onCheckverify() {
     validationText.style.color = "#20af46";
 }
 
+// 4. 最终登录按钮
 async function finalLogin() {
     const isTickVisible = !document.querySelector('.tick-box').classList.contains('close');
     if (!isTickVisible) {
@@ -67,6 +68,12 @@ async function finalLogin() {
 
     const account = document.getElementById('account').value.trim();
     const password = document.getElementById('password').value.trim();
+
+    // 检查账号密码是否为空
+    if (!account || !password) {
+        alert("请输入账号和密码");
+        return;
+    }
 
     try {
         const response = await fetch('./users.txt');
