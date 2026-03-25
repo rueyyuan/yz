@@ -13,19 +13,13 @@ const validationText = document.getElementById('validation');
 function onOpenverify() {
     const account = document.getElementById('account').value;
     const pass = document.getElementById('password').value;
-
     if (!account || !pass) {
         alert("请先输入账号和密码");
         return;
     }
-
     if (isVerified) return;
-
-    // 显示加载转圈
     checkBoxBorder.classList.add('close');
     spinner.classList.remove('close');
-
-    // 模拟网络延迟后弹出大图
     setTimeout(() => {
         spinner.classList.add('close');
         checkBoxBorder.classList.remove('close');
@@ -38,7 +32,6 @@ document.querySelectorAll('.image-box').forEach(box => {
     box.addEventListener('click', function() {
         const img = this.querySelector('.img');
         const ico = this.querySelector('.checked-ico');
-        
         if (img.classList.contains('checked')) {
             img.classList.remove('checked');
             ico.classList.remove('checked');
@@ -51,38 +44,56 @@ document.querySelectorAll('.image-box').forEach(box => {
     });
 });
 
-// 3. 点击验证层里的“验证”按钮
+// 3. 点击验证层里的"验证"按钮
 function onCheckverify() {
     if (selectedCount === 0) {
         alert("请选择符合描述的图片");
         return;
     }
-
-    // 验证成功流程
     verifyLayer.classList.add('close');
-    checkBoxBorder.classList.add('close'); // 隐藏方框
-    tickBox.classList.remove('close');    // 显示绿勾
-    
+    checkBoxBorder.classList.add('close');
+    tickBox.classList.remove('close');
     isVerified = true;
     validationText.innerText = "身份已确认";
     validationText.style.color = "#20af46";
 }
 
-// 4. 最终登录按钮
-function finalLogin() {
+async function finalLogin() {
     const isTickVisible = !document.querySelector('.tick-box').classList.contains('close');
-
-    if (isTickVisible) {
-        // 1. 视觉上的关闭：让登录卡片消失
-        document.querySelector('.login-card').style.opacity = '0';
-        document.querySelector('.login-card').style.transition = '0.5s';
-        
-        // 2. 延迟跳转，给用户一个“退出”的动画感
-        setTimeout(() => {
-            window.location.replace("https://rueyyuan.github.io/yz/verity/index.html");
-        }, 500);
-    } else {
+    if (!isTickVisible) {
         alert("请先完成人机身份验证");
+        return;
+    }
+
+    const account = document.getElementById('account').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    try {
+        const response = await fetch('./users.txt');
+        if (!response.ok) throw new Error("找不到用户文件");
+        const text = await response.text();
+
+        // 解析账号密码（每行格式：账号:密码）
+        const users = text.trim().split('\n').map(line => {
+            const [u, p] = line.split(':');
+            return { username: u?.trim(), password: p?.trim() };
+        });
+
+        const match = users.find(u => u.username === account && u.password === password);
+
+        if (match) {
+            // 登录成功
+            document.querySelector('.login-card').style.opacity = '0';
+            document.querySelector('.login-card').style.transition = '0.5s';
+            setTimeout(() => {
+                window.location.replace("https://rueyyuan.github.io/yz/verity/index.html");
+            }, 500);
+        } else {
+            alert("账号或密码错误");
+        }
+
+    } catch (err) {
+        alert("验证失败：" + err.message);
     }
 }
 
